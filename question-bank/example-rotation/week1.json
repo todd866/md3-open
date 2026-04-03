@@ -1,0 +1,87 @@
+[
+  {
+    "id": "qb-o2-001",
+    "rotation": "example-rotation",
+    "week": 1,
+    "topics": ["Oxygen Therapy", "Respiratory Physiology"],
+    "questionType": "mechanism",
+    "difficulty": "medium",
+    "stem": "A 72-year-old woman with pulmonary fibrosis has a PaO2 of 55 mmHg on room air. Her haemoglobin is 140 g/L. Which of the following changes would most increase her tissue oxygen delivery?",
+    "options": [
+      { "label": "A", "text": "Increasing cardiac output by 20%", "isCorrect": true, "explanation": "Oxygen delivery (DO2) = CO x CaO2. Since CaO2 is already near-maximum with adequate Hb, increasing cardiac output has the greatest effect on total delivery." },
+      { "label": "B", "text": "Increasing FiO2 from 0.21 to 0.28", "isCorrect": false, "explanation": "While this would improve PaO2, the sigmoidal shape of the dissociation curve means small PaO2 increases on the steep portion produce modest SaO2 gains when starting at 55 mmHg." },
+      { "label": "C", "text": "Transfusing 1 unit of packed red cells", "isCorrect": false, "explanation": "Her haemoglobin of 140 g/L is already adequate. Transfusion would increase viscosity without meaningful DO2 improvement." },
+      { "label": "D", "text": "Administering sodium bicarbonate", "isCorrect": false, "explanation": "Alkalosis shifts the dissociation curve left, increasing oxygen loading in the lungs but impairing tissue unloading — potentially worsening tissue hypoxia." },
+      { "label": "E", "text": "Cooling the patient to 35 degrees Celsius", "isCorrect": false, "explanation": "Hypothermia shifts the curve left (increased Hb-O2 affinity), which may impair oxygen release at the tissue level." }
+    ],
+    "context": "Oxygen delivery (DO2) = Cardiac Output x (1.34 x Hb x SaO2 + 0.003 x PaO2). The dissolved oxygen component (0.003 x PaO2) is negligible. Increasing CO is the most effective strategy when Hb and SaO2 are already adequate."
+  },
+  {
+    "id": "qb-o2-002",
+    "rotation": "example-rotation",
+    "week": 1,
+    "topics": ["Oxygen Therapy", "COPD"],
+    "questionType": "management",
+    "difficulty": "easy",
+    "stem": "What is the target SpO2 range for a patient with known COPD and chronic CO2 retention during an acute exacerbation?",
+    "options": [
+      { "label": "A", "text": "94-98%", "isCorrect": false, "explanation": "This is the target for patients without risk of hypercapnic respiratory failure. Using this target in COPD risks worsening CO2 retention." },
+      { "label": "B", "text": "88-92%", "isCorrect": true, "explanation": "The BTS guideline recommends 88-92% for patients at risk of hypercapnic respiratory failure, balancing adequate oxygenation against CO2 retention risk." },
+      { "label": "C", "text": "80-85%", "isCorrect": false, "explanation": "SpO2 below 88% indicates significant hypoxaemia requiring escalation of therapy. This is not an acceptable target." },
+      { "label": "D", "text": "98-100%", "isCorrect": false, "explanation": "Targeting 100% in COPD patients with CO2 retention can cause dangerous hypercapnia and respiratory depression." },
+      { "label": "E", "text": "85-90%", "isCorrect": false, "explanation": "While close, the accepted guideline range is 88-92%. An SpO2 of 85% would warrant escalation." }
+    ],
+    "context": "BTS Guideline (2017): Target SpO2 88-92% for patients at risk of hypercapnic respiratory failure. Check ABG within 30-60 minutes of starting oxygen. The rationale is that these patients rely partly on hypoxic respiratory drive."
+  },
+  {
+    "id": "qb-o2-003",
+    "rotation": "example-rotation",
+    "week": 1,
+    "topics": ["Oxygen Therapy", "HFNC"],
+    "questionType": "mechanism",
+    "difficulty": "hard",
+    "stem": "A patient on high-flow nasal cannulae (HFNC) at 50 L/min with FiO2 0.4 has their mouth open during sleep. What is the most likely effect on the delivered PEEP?",
+    "options": [
+      { "label": "A", "text": "PEEP increases due to increased airway resistance", "isCorrect": false, "explanation": "Opening the mouth decreases resistance to gas outflow, reducing back-pressure rather than increasing it." },
+      { "label": "B", "text": "PEEP decreases significantly as the circuit becomes open", "isCorrect": true, "explanation": "The PEEP effect of HFNC depends on a relatively closed oral cavity. With mouth open, gas escapes freely and positive pressure drops substantially." },
+      { "label": "C", "text": "PEEP remains unchanged as it is flow-dependent only", "isCorrect": false, "explanation": "While PEEP is flow-dependent, it also requires a degree of circuit closure. An open mouth vents the pressure." },
+      { "label": "D", "text": "FiO2 increases compensating for the PEEP loss", "isCorrect": false, "explanation": "FiO2 actually decreases with mouth opening because room air mixes with the delivered gas, diluting the oxygen concentration." },
+      { "label": "E", "text": "Dead space washout becomes the primary mechanism of benefit", "isCorrect": false, "explanation": "Dead space washout does continue but cannot compensate for the loss of PEEP in terms of alveolar recruitment and reduced work of breathing." }
+    ],
+    "context": "HFNC generates PEEP through nasopharyngeal resistance to high gas flow. Studies show 2-5 cmH2O PEEP with mouth closed at flows of 30-60 L/min. With mouth open, measured PEEP drops to near-zero. This is clinically relevant during sleep."
+  },
+  {
+    "id": "qb-o2-004",
+    "rotation": "example-rotation",
+    "week": 1,
+    "topics": ["Oxygen Therapy", "Physiology"],
+    "questionType": "mechanism",
+    "difficulty": "medium",
+    "stem": "Which of the following conditions causes a leftward shift of the oxygen-haemoglobin dissociation curve?",
+    "options": [
+      { "label": "A", "text": "Fever (temperature 39.5 degrees Celsius)", "isCorrect": false, "explanation": "Increased temperature shifts the curve right, promoting oxygen release to tissues with higher metabolic demand." },
+      { "label": "B", "text": "Metabolic acidosis (pH 7.20)", "isCorrect": false, "explanation": "Acidosis (Bohr effect) shifts the curve right, facilitating oxygen unloading at the tissue level." },
+      { "label": "C", "text": "Carbon monoxide poisoning", "isCorrect": true, "explanation": "Carbon monoxide binds haemoglobin with 200x the affinity of oxygen and shifts the curve left, impairing oxygen release to tissues. This is why CO poisoning causes tissue hypoxia even with apparently normal SaO2." },
+      { "label": "D", "text": "Anaemia (Hb 70 g/L)", "isCorrect": false, "explanation": "Anaemia reduces total oxygen-carrying capacity but does not shift the dissociation curve. The remaining haemoglobin behaves normally." },
+      { "label": "E", "text": "Exercise", "isCorrect": false, "explanation": "Exercise increases temperature, CO2, and lactic acid — all of which shift the curve right, enhancing oxygen delivery to working muscles." }
+    ],
+    "context": "Left shift = increased O2 affinity (holds on tighter). Causes: alkalosis, hypothermia, low 2,3-DPG, carbon monoxide, fetal haemoglobin, methaemoglobinaemia. Right shift (CADET — CO2, Acidosis, 2,3-DPG, Exercise, Temperature)."
+  },
+  {
+    "id": "qb-o2-005",
+    "rotation": "example-rotation",
+    "week": 1,
+    "topics": ["Oxygen Therapy", "Monitoring"],
+    "questionType": "interpretation",
+    "difficulty": "easy",
+    "stem": "A pulse oximeter reads SpO2 of 99% in a patient who has been exposed to a house fire. An arterial blood gas shows PaO2 of 95 mmHg. What is the most important consideration?",
+    "options": [
+      { "label": "A", "text": "The readings are reassuringly normal — no further investigation needed", "isCorrect": false, "explanation": "In fire exposure, normal SpO2 is falsely reassuring. Carboxyhaemoglobin is read as oxyhaemoglobin by standard pulse oximeters." },
+      { "label": "B", "text": "Pulse oximetry cannot distinguish oxyhaemoglobin from carboxyhaemoglobin", "isCorrect": true, "explanation": "Standard pulse oximeters use two wavelengths (660nm and 940nm) and cannot differentiate HbO2 from COHb. A co-oximeter (ABG with COHb level) is essential in fire exposure." },
+      { "label": "C", "text": "The patient should receive 100% oxygen only if SpO2 drops below 94%", "isCorrect": false, "explanation": "All patients with significant smoke inhalation should receive high-flow 100% oxygen regardless of SpO2, to accelerate CO dissociation (half-life drops from 4-6 hours on room air to 60-90 minutes on 100% O2)." },
+      { "label": "D", "text": "PaO2 confirms adequate tissue oxygenation", "isCorrect": false, "explanation": "PaO2 measures dissolved oxygen in plasma, not total oxygen content. With high COHb, tissue oxygen delivery is severely impaired despite normal PaO2." },
+      { "label": "E", "text": "A venous blood gas would be more accurate than an arterial sample", "isCorrect": false, "explanation": "Both arterial and venous gases can measure COHb via co-oximetry, but the issue is using the right test (co-oximetry), not the sampling site." }
+    ],
+    "context": "Standard pulse oximeters measure at 660nm and 940nm. COHb absorbs similarly to HbO2 at 660nm, so SpO2 reads falsely high. Always check COHb by co-oximetry in fire/smoke exposure. Treat with 100% O2 to reduce CO half-life."
+  }
+]

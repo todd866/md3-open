@@ -1,0 +1,166 @@
+@import "tailwindcss";
+
+/* MD3 Design Tokens */
+:root {
+  /* Primary colors */
+  --md-primary: #1e3a5f;
+  --md-on-primary: #ffffff;
+  --md-primary-container: #d4e4f7;
+  --md-on-primary-container: #001c38;
+
+  /* Secondary colors */
+  --md-secondary: #3d5a80;
+  --md-on-secondary: #ffffff;
+  --md-secondary-container: #e8f4f8;
+  --md-on-secondary-container: #0f1c2e;
+
+  /* Tertiary/Accent */
+  --md-tertiary: #ee6c4d;
+  --md-on-tertiary: #ffffff;
+  --md-tertiary-container: #ffdad4;
+  --md-on-tertiary-container: #410001;
+
+  /* Surface colors */
+  --md-surface: #fafafa;
+  --md-surface-dim: #dcdcdc;
+  --md-surface-bright: #ffffff;
+  --md-surface-container-lowest: #ffffff;
+  --md-surface-container-low: #f5f5f5;
+  --md-surface-container: #eeeeee;
+  --md-surface-container-high: #e8e8e8;
+  --md-surface-container-highest: #e0e0e0;
+  --md-on-surface: #1a1c1e;
+  --md-on-surface-variant: #43474e;
+
+  /* Semantic colors */
+  --md-error: #ba1a1a;
+  --md-on-error: #ffffff;
+  --md-error-container: #ffdad6;
+  --md-on-error-container: #410002;
+
+  --md-success: #2e7d32;
+  --md-on-success: #ffffff;
+  --md-success-container: #c8e6c9;
+  --md-on-success-container: #002106;
+
+  --md-warning: #ed6c02;
+  --md-on-warning: #ffffff;
+
+  /* Outline */
+  --md-outline: #73777f;
+  --md-outline-variant: #c3c6cf;
+
+  /* Content component colors */
+  --keypoint-bg: #e8f4f8;
+  --keypoint-border: #3d5a80;
+  --pearl-bg: #f0fff4;
+  --pearl-border: #38a169;
+  --danger-bg: #fed7d7;
+  --danger-border: #e53e3e;
+  --mnemonic-bg: #faf5ff;
+  --mnemonic-border: #805ad5;
+
+  /* Shadows */
+  --md-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --md-shadow-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+
+  /* Border radius */
+  --md-radius-sm: 8px;
+  --md-radius-md: 12px;
+  --md-radius-lg: 16px;
+  --md-radius-xl: 28px;
+  --md-radius-full: 9999px;
+}
+
+/* Dark mode */
+.dark {
+  --md-primary: #a4c8e8;
+  --md-on-primary: #003258;
+  --md-primary-container: #0f4a7a;
+  --md-on-primary-container: #d4e4f7;
+
+  --md-secondary: #b8cce8;
+  --md-on-secondary: #223448;
+  --md-secondary-container: #3a4b5f;
+  --md-on-secondary-container: #e8f4f8;
+
+  --md-tertiary: #ffb4a4;
+  --md-on-tertiary: #690003;
+  --md-tertiary-container: #930006;
+  --md-on-tertiary-container: #ffdad4;
+
+  --md-surface: #121212;
+  --md-surface-dim: #0d0d0d;
+  --md-surface-bright: #1e1e1e;
+  --md-surface-container-lowest: #0a0a0a;
+  --md-surface-container-low: #151515;
+  --md-surface-container: #1a1a1a;
+  --md-surface-container-high: #242424;
+  --md-surface-container-highest: #2e2e2e;
+  --md-on-surface: #e3e3e3;
+  --md-on-surface-variant: #c3c6cf;
+
+  --md-error: #ffb4ab;
+  --md-on-error: #690005;
+  --md-error-container: #93000a;
+  --md-on-error-container: #ffdad6;
+
+  --md-success: #81c784;
+  --md-on-success: #003910;
+  --md-success-container: #005318;
+  --md-on-success-container: #c8e6c9;
+
+  --md-warning: #ffb74d;
+  --md-on-warning: #4a2700;
+
+  --md-outline: #8d9199;
+  --md-outline-variant: #43474e;
+
+  --keypoint-bg: #1a2e3d;
+  --keypoint-border: #5a8ab5;
+  --pearl-bg: #1a2e1a;
+  --pearl-border: #4ade80;
+  --danger-bg: #3d1a1a;
+  --danger-border: #f87171;
+  --mnemonic-bg: #2d1f3d;
+  --mnemonic-border: #a78bfa;
+}
+
+@theme inline {
+  --color-primary: var(--md-primary);
+  --color-on-primary: var(--md-on-primary);
+  --color-surface: var(--md-surface);
+  --color-on-surface: var(--md-on-surface);
+  --color-on-surface-variant: var(--md-on-surface-variant);
+  --color-surface-container: var(--md-surface-container);
+  --color-outline: var(--md-outline);
+  --color-outline-variant: var(--md-outline-variant);
+}
+
+/* Base styles */
+body {
+  background: var(--md-surface);
+  color: var(--md-on-surface);
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
+}
+
+:focus-visible {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 2px;
+}
+
+* {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}

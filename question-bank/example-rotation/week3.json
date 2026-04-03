@@ -1,0 +1,53 @@
+[
+  {
+    "id": "qb-shock-001",
+    "rotation": "example-rotation",
+    "week": 3,
+    "topics": ["Shock", "Haemodynamics"],
+    "questionType": "diagnosis",
+    "difficulty": "medium",
+    "stem": "A 55-year-old woman is brought to the emergency department after a motor vehicle accident. She is pale, diaphoretic, with BP 76/50 mmHg, HR 132 bpm, and cold extremities. Her JVP is flat and breath sounds are clear bilaterally. Which type of shock is most likely?",
+    "options": [
+      { "label": "A", "text": "Cardiogenic shock", "isCorrect": false, "explanation": "Cardiogenic shock typically presents with elevated JVP and may have pulmonary oedema (crackles). A flat JVP points away from cardiogenic cause." },
+      { "label": "B", "text": "Hypovolaemic shock", "isCorrect": true, "explanation": "Trauma with hypotension, tachycardia, flat JVP, cold peripheries, and clear lungs is classic for hypovolaemic shock from haemorrhage. The low filling pressures (flat JVP) confirm volume depletion." },
+      { "label": "C", "text": "Distributive shock", "isCorrect": false, "explanation": "Distributive (septic/anaphylactic) shock typically presents with warm peripheries due to vasodilation, not cold and pale extremities." },
+      { "label": "D", "text": "Obstructive shock from tension pneumothorax", "isCorrect": false, "explanation": "Tension pneumothorax would cause elevated JVP, tracheal deviation, and absent breath sounds on the affected side. Bilateral clear breath sounds and flat JVP make this unlikely." },
+      { "label": "E", "text": "Neurogenic shock", "isCorrect": false, "explanation": "Neurogenic shock causes bradycardia (not tachycardia) and warm, dry skin due to loss of sympathetic tone. The tachycardia and cold peripheries here indicate a sympathetic response to volume loss." }
+    ],
+    "context": "Hypovolaemic shock: low CO, high SVR, low filling pressures (flat JVP, low CVP). Treatment priority is volume replacement — crystalloid or blood products depending on the cause. In trauma, activate massive transfusion protocol if Class III/IV haemorrhage."
+  },
+  {
+    "id": "qb-shock-002",
+    "rotation": "example-rotation",
+    "week": 3,
+    "topics": ["Vasopressors", "Pharmacology"],
+    "questionType": "mechanism",
+    "difficulty": "hard",
+    "stem": "Noradrenaline is the first-line vasopressor in septic shock. Which receptor profile best explains its haemodynamic effects?",
+    "options": [
+      { "label": "A", "text": "Predominantly alpha-1 agonism with modest beta-1 activity", "isCorrect": true, "explanation": "Noradrenaline is a potent alpha-1 agonist (vasoconstriction) with moderate beta-1 activity (mild inotropy). This combination increases SVR while maintaining or slightly improving cardiac output." },
+      { "label": "B", "text": "Predominantly beta-1 and beta-2 agonism", "isCorrect": false, "explanation": "This profile describes isoprenaline or adrenaline at low doses. Beta-2 activation causes vasodilation, which would worsen distributive shock." },
+      { "label": "C", "text": "Pure alpha-1 agonism with no beta activity", "isCorrect": false, "explanation": "This describes phenylephrine. Unlike phenylephrine, noradrenaline has beta-1 activity that helps maintain cardiac output alongside vasoconstriction." },
+      { "label": "D", "text": "V1 receptor agonism on vascular smooth muscle", "isCorrect": false, "explanation": "V1 receptor agonism describes vasopressin, not noradrenaline. Vasopressin works via a non-adrenergic mechanism." },
+      { "label": "E", "text": "Dopamine receptor agonism at renal vasculature", "isCorrect": false, "explanation": "Dopamine receptor agonism describes low-dose dopamine. Renal-dose dopamine has been shown to provide no meaningful clinical benefit in shock." }
+    ],
+    "context": "Noradrenaline: alpha-1 (potent vasoconstriction) + beta-1 (moderate inotropy). This makes it ideal for septic shock where the problem is vasodilation (low SVR). Unlike pure alpha agonists, the beta-1 component helps maintain cardiac output."
+  },
+  {
+    "id": "qb-shock-003",
+    "rotation": "example-rotation",
+    "week": 3,
+    "topics": ["Sepsis", "Monitoring"],
+    "questionType": "interpretation",
+    "difficulty": "easy",
+    "stem": "A patient with septic shock has a lactate of 6.2 mmol/L (normal less than 2) at presentation. After 3 hours of resuscitation, the repeat lactate is 3.8 mmol/L. What does this trend indicate?",
+    "options": [
+      { "label": "A", "text": "Lactate clearance indicates improving tissue perfusion", "isCorrect": true, "explanation": "A falling lactate (lactate clearance) indicates that tissue oxygen delivery is improving and anaerobic metabolism is resolving. The Surviving Sepsis Campaign recommends targeting lactate normalisation." },
+      { "label": "B", "text": "The lactate is still abnormal so treatment is failing", "isCorrect": false, "explanation": "While the lactate is still above normal, the trend is more important than the absolute value. A 39% reduction in 3 hours indicates a positive response to resuscitation." },
+      { "label": "C", "text": "Lactate clearance is unreliable and should not guide therapy", "isCorrect": false, "explanation": "Serial lactate monitoring is strongly recommended by the Surviving Sepsis Campaign (2021) as a marker of resuscitation adequacy." },
+      { "label": "D", "text": "The patient no longer needs vasopressor support", "isCorrect": false, "explanation": "Improving lactate is encouraging, but vasopressor requirements should be titrated based on MAP target (at least 65 mmHg), not lactate alone." },
+      { "label": "E", "text": "This change is within normal measurement variation", "isCorrect": false, "explanation": "A reduction from 6.2 to 3.8 mmol/L (39% decrease) is clinically significant and well beyond normal assay variation." }
+    ],
+    "context": "Lactate clearance (decrease of at least 10-20% over 2-4 hours) is a key marker of adequate resuscitation. Persistently elevated or rising lactate despite treatment should trigger reassessment of the diagnosis, adequacy of source control, and escalation of haemodynamic support."
+  }
+]

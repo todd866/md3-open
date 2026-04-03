@@ -1,0 +1,228 @@
+// =============================================================================
+// MD3 Open — Prisma Schema
+//
+// Simplified schema for the open-source version. All content verticals share
+// the Card and Question tables, distinguished by the `rotation` field.
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================================
+// USER
+// =============================================================================
+
+model User {
+  id        String    @id @default(cuid())
+  name      String?
+  examDate  DateTime?
+  createdAt DateTime  @default(now())
+
+  // Relations
+  cardProgress      CardProgress[]
+  questionResponses QuestionResponse[]
+  dailyStats        DailyStats[]
+}
+
+// =============================================================================
+// CARD — Auto-generated from MDX content (cloze-deletion flashcards)
+// =============================================================================
+
+model Card {
+  id       String @id @default(cuid())
+  cardType String // 'cloze' — the card format
+
+  // Organization
+  rotation String  // e.g., 'example-rotation' — groups cards by curriculum module
+  week     Int?    // 1-7, maps to teaching weeks
+  sourceFile      String? // e.g., 'week1-oxygen-therapy' — origin MDX file
+  sourceComponent String  // 'Mnemonic' | 'KeyPoint' | 'Danger' | 'ClinicalPearl'
+
+  // Deterministic ID for stable upserts — same content always gets same stableId
+  // so re-seeding doesn't wipe user progress
+  stableId String? @unique
+
+  // Content
+  front   String  @db.Text // Question with [___] blanks
+  back    String  @db.Text // Answer (fills the blanks)
+  backs   Json?            // Array of answers for multi-blank cards
+  context String? @db.Text // Teaching context shown after answer reveal
+  topics  String[]         // e.g., ['Oxygen Therapy', 'Hypoxia']
+
+  // Quality metadata
+  complexity Int @default(2) // 1=trivial, 2=moderate, 3=complex
+
+  // Soft-delete: set when card is removed from MDX source
+  // Preserves CardProgress history for users who already studied it
+  deletedAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  progress CardProgress[]
+
+  @@index([rotation, week])
+  @@index([deletedAt])
+}
+
+// =============================================================================
+// CARD PROGRESS — Per-user scheduling state for each card
+//
+// This is the core of the spaced repetition system. Each field drives a
+// specific scheduling decision:
+//
+//   stabilityDays  — memory half-life; controls how fast the card decays
+//   nextDueAt      — when the scheduler will show this card again
+//   retrievalStrength — predicted recall probability (0-1)
+// =============================================================================
+
+model CardProgress {
+  id     String @id @default(cuid())
+  cardId String
+  userId String
+
+  // Scheduling (stability-based, not SM-2)
+  stabilityDays Float    @default(3)    // Higher = slower memory decay
+  nextDueAt     DateTime @default(now()) // When card becomes due again
+
+  // Review history
+  lastReview   DateTime?
+  lastQuality  Int?      // 0-5 scale: Again=0, Hard=1, Good=3, Easy=5
+  totalReviews Int       @default(0)
+  correctCount Int       @default(0)
+
+  // User feedback
+  flagged    Boolean   @default(false)
+  flaggedAt  DateTime?
+  flagReason String?   // 'Irrelevant' | 'Incorrect' | 'Confusing' | etc.
+
+  // Mastery tracking
+  status                 String    @default("learning") // learning | reviewing | mastered
+  retrievalStrength      Float     @default(0)          // Computed from review history (0-1)
+  consecutiveCorrectFast Int       @default(0)
+  avgResponseTimeMs      Int?
+  masteredAt             DateTime?
+
+  card Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, userId])
+  @@index([userId, nextDueAt])
+  @@index([userId, status])
+}
+
+// =============================================================================
+// QUESTION — MCQ assessment items (loaded from question bank JSON)
+// =============================================================================
+
+model Question {
+  id String @id @default(cuid())
+
+  // Content
+  stem    String  @db.Text             // Clinical scenario / question prompt
+  options Json                          // [{label, text, isCorrect, explanation?}]
+  context String? @db.Text @map("explanation") // Teaching: why the answer is correct
+
+  // Organization
+  rotation String
+  week     Int?
+  topics   String[]
+
+  // Metadata
+  source       String  // 'question-bank', 'ai-generated', etc.
+  sourceFile   String? // Origin file path
+  questionType String  // 'diagnosis', 'next-step', 'mechanism', etc.
+  difficulty   String  @default("medium") // 'easy' | 'medium' | 'hard'
+
+  // Analytics (computed from responses)
+  totalAttempts Int @default(0)
+
+  responses QuestionResponse[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([rotation, week])
+  @@index([questionType])
+}
+
+// =============================================================================
+// QUESTION RESPONSE — Records every MCQ answer for analytics
+// =============================================================================
+
+model QuestionResponse {
+  id         String @id @default(cuid())
+  userId     String
+  questionId String
+
+  selectedOption String  // 'A', 'B', 'C', 'D', 'E'
+  isCorrect      Boolean
+  responseTimeMs Int?
+
+  // Shuffle tracking (detects position bias)
+  correctDisplayPosition  Int? // Where correct answer appeared (0-indexed)
+  selectedDisplayPosition Int? // Where user clicked (0-indexed)
+
+  flagged Boolean @default(false)
+
+  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, questionId])
+  @@index([userId, createdAt])
+}
+
+// =============================================================================
+// CONTENT ISSUE — User-reported flags on content quality
+// =============================================================================
+
+model ContentIssue {
+  id String @id @default(cuid())
+
+  targetType String // 'question' | 'card' | 'component' | 'page'
+  targetId   String
+  issueType  String // 'incorrect' | 'confusing' | 'needs-image' | 'other'
+  createdBy  String? // userId of the reporter
+
+  status   String @default("open") // 'open' | 'resolved' | 'wont-fix'
+  priority String @default("normal")
+
+  reportCount     Int      @default(1)
+  contentSnapshot String?  @db.Text // First 200 chars of flagged content
+  path            String?            // Page path where reported
+  rotation        String?
+  metadata        Json?              // Arbitrary context
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  resolvedAt DateTime?
+
+  @@index([createdBy, createdAt])
+
+  @@index([status])
+  @@index([targetType, targetId])
+}
+
+// =============================================================================
+// DAILY STATS — Aggregated daily study metrics
+// =============================================================================
+
+model DailyStats {
+  id            String   @id @default(cuid())
+  userId        String
+  date          DateTime @db.Date
+  cardsReviewed Int      @default(0)
+  cardsCorrect  Int      @default(0)
+  newCardsSeen  Int      @default(0)
+  studyTimeMs   Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
