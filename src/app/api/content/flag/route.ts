@@ -4,12 +4,12 @@ import { prisma } from '@/lib/prisma';
 import { getGuestUser } from '@/lib/api-utils';
 
 const VALID_TYPES = ['card', 'question', 'component'] as const;
-const VALID_REASONS = ['incorrect', 'confusing', 'too easy', 'formatting', 'other'] as const;
+const VALID_REASONS = ['incorrect', 'confusing', 'too easy', 'formatting', 'context', 'giveaway', 'rewrite', 'other'] as const;
 
 const schema = z.object({
   type: z.enum(VALID_TYPES),
   id: z.string().max(100),
-  reason: z.enum(VALID_REASONS),
+  reason: z.string().max(50).transform(s => s.toLowerCase()).pipe(z.enum(VALID_REASONS)),
   message: z.string().max(500).optional(),
 });
 
