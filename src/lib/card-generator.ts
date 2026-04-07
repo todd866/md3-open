@@ -221,16 +221,26 @@ function extractMnemonicCards(content: string, rotation: string, week: number | 
   return cards;
 }
 
-function extractQAComponentCards(
+/**
+ * Generic extractor for Q&A-based components (KeyPoint, Danger, ClinicalPearl).
+ * All three share the same extraction logic -- only the tag name, source component
+ * label, and complexity calculation differ.
+ */
+interface ComponentCardConfig {
+  tagName: string;
+  sourceComponent: 'KeyPoint' | 'Danger' | 'ClinicalPearl';
+  getComplexity: (answer: string, question: string) => 1 | 2 | 3;
+}
+
+function extractComponentCards(
   content: string,
-  tag: string,
-  sourceComponent: 'KeyPoint' | 'Danger' | 'ClinicalPearl',
   rotation: string,
   week: number | null,
-  headings: Heading[]
+  headings: Heading[],
+  config: ComponentCardConfig,
 ): GeneratedCard[] {
   const cards: GeneratedCard[] = [];
-  const blocks = extractComponentBlocks(content, tag);
+  const blocks = extractComponentBlocks(content, config.tagName);
 
   for (const block of blocks) {
     const body = stripMdxComponents(block.body);
@@ -245,12 +255,12 @@ function extractQAComponentCards(
       cards.push({
         cardType: 'cloze',
         rotation, week,
-        sourceComponent,
+        sourceComponent: config.sourceComponent,
         front: qa.question,
         back: qa.answer,
         context,
         topics,
-        complexity: calculateComplexity(sourceComponent, qa.answer, qa.question),
+        complexity: config.getComplexity(qa.answer, qa.question),
       });
     }
   }
@@ -274,9 +284,21 @@ export function parseContentFile(filePath: string, rotation: string): GeneratedC
   const cards: GeneratedCard[] = [];
 
   cards.push(...extractMnemonicCards(content, rotation, week, headings));
-  cards.push(...extractQAComponentCards(content, 'KeyPoint', 'KeyPoint', rotation, week, headings));
-  cards.push(...extractQAComponentCards(content, 'Danger', 'Danger', rotation, week, headings));
-  cards.push(...extractQAComponentCards(content, 'ClinicalPearl', 'ClinicalPearl', rotation, week, headings));
+  cards.push(...extractComponentCards(content, rotation, week, headings, {
+    tagName: 'KeyPoint',
+    sourceComponent: 'KeyPoint',
+    getComplexity: (answer, question) => calculateComplexity('KeyPoint', answer, question),
+  }));
+  cards.push(...extractComponentCards(content, rotation, week, headings, {
+    tagName: 'Danger',
+    sourceComponent: 'Danger',
+    getComplexity: () => 2,
+  }));
+  cards.push(...extractComponentCards(content, rotation, week, headings, {
+    tagName: 'ClinicalPearl',
+    sourceComponent: 'ClinicalPearl',
+    getComplexity: () => 2,
+  }));
 
   // Post-process: split list answers + add sourceFile + title context
   const fileTitle = typeof data.title === 'string' ? data.title : undefined;

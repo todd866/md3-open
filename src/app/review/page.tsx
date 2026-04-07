@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { normalizeAngleBracketEscapes } from '@/lib/normalize-angle-bracket-escapes';
+import { useMCQState } from '@/hooks/useMCQState';
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -194,12 +195,20 @@ export default function ReviewPage() {
   // Card state
   const [revealedBlanks, setRevealedBlanks] = useState(0);
 
-  // MCQ state
-  const [selectedOption, setSelectedOption] = useState<string | null>(null);
-  const [mcqAnswered, setMcqAnswered] = useState(false);
-
   const startTimeRef = useRef(Date.now());
   const currentItem = items[currentIndex];
+
+  // MCQ state via shared hook
+  const mcqCorrectLabel = currentItem?.type === 'question'
+    ? (currentItem.options.find(o => o.isCorrect)?.label ?? '')
+    : '';
+
+  const {
+    selectedAnswer: selectedOption,
+    hasAnswered: mcqAnswered,
+    handleOptionClick: mcqOptionClick,
+    handleReset: resetMcqState,
+  } = useMCQState({ correctLabel: mcqCorrectLabel });
 
   // Fetch session items
   useEffect(() => {
@@ -236,11 +245,10 @@ export default function ReviewPage() {
   const advanceToNext = useCallback(() => {
     setCurrentIndex(prev => prev + 1);
     setRevealedBlanks(0);
-    setSelectedOption(null);
-    setMcqAnswered(false);
+    resetMcqState();
     setReviewed(prev => prev + 1);
     startTimeRef.current = Date.now();
-  }, []);
+  }, [resetMcqState]);
 
   const handleReveal = useCallback(() => {
     setRevealedBlanks(prev => Math.min(prev + 1, blankCount > 0 ? blankCount : 1));
@@ -277,8 +285,7 @@ export default function ReviewPage() {
 
   const handleMcqSelect = useCallback(async (label: string) => {
     if (mcqAnswered || !currentItem || currentItem.type !== 'question') return;
-    setSelectedOption(label);
-    setMcqAnswered(true);
+    mcqOptionClick(label);
 
     const responseTimeMs = Date.now() - startTimeRef.current;
 
@@ -296,7 +303,7 @@ export default function ReviewPage() {
     } catch (err) {
       console.error('MCQ response save failed:', err);
     }
-  }, [mcqAnswered, currentItem]);
+  }, [mcqAnswered, currentItem, mcqOptionClick]);
 
   // Keyboard shortcuts
   useEffect(() => {

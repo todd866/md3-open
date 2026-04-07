@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { ContentFlag } from './ContentFlag';
 import { shuffleWithSeed, displaceFirst } from '@/lib/utils/shuffle';
+import { useMCQState } from '@/hooks/useMCQState';
 
 // ─── Types ────────────────────────────────────────────────────────
 
@@ -87,9 +88,6 @@ const difficultyColors: Record<string, string> = {
 export function MCQ(props: MCQProps) {
   const { type = 'SBA', difficulty = 'medium', topics = [] } = props;
   const { stem, options: staticOptions, correctLabel: staticCorrectLabel, context: explanation } = normalizeInput(props);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const [hasAnswered, setHasAnswered] = useState(false);
   const [expandedOptions, setExpandedOptions] = useState<Set<string>>(new Set());
   const [shuffleEpoch] = useState(() => Date.now());
   const containerRef = useRef<HTMLDivElement>(null);
@@ -118,19 +116,17 @@ export function MCQ(props: MCQProps) {
     };
   }, [staticOptions, staticCorrectLabel, stem, shuffleEpoch]);
 
-  const isCorrect = selectedAnswer === correctLabel;
-
-  const handleOptionClick = useCallback((label: string) => {
-    if (hasAnswered) return;
-    setSelectedAnswer(label);
-    setShowResult(true);
-    setHasAnswered(true);
-  }, [hasAnswered]);
+  const {
+    selectedAnswer,
+    showResult,
+    hasAnswered,
+    isCorrect,
+    handleOptionClick,
+    handleReset: resetMCQState,
+  } = useMCQState({ correctLabel });
 
   const handleReset = () => {
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setHasAnswered(false);
+    resetMCQState();
     setExpandedOptions(new Set());
   };
 

@@ -8,6 +8,8 @@
  * Users click 'A' when unsure, so correct answers are placed later more often.
  */
 
+import { hashString } from './hash';
+
 /** Mulberry32 PRNG — fast, high-quality 32-bit generator */
 function mulberry32(seed: number): () => number {
   return function () {
@@ -16,17 +18,6 @@ function mulberry32(seed: number): () => number {
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-}
-
-/** Hash a string to a 32-bit integer for PRNG seeding */
-function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash |= 0;
-  }
-  return Math.abs(hash);
 }
 
 /**
