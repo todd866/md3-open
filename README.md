@@ -1,5 +1,9 @@
 # MD3 Open
 
+[![CI](https://github.com/todd866/md3-open/actions/workflows/ci.yml/badge.svg)](https://github.com/todd866/md3-open/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftodd866%2Fmd3-open&env=DATABASE_URL&envDescription=Postgres%20connection%20string%20(e.g.%20Neon%20free%20tier))
+
 A simplified, MIT-licensed reference implementation of the spaced-repetition core that powers [md3.info](https://md3.info) — a personalised study tool used daily by a handful of medical students at the University of Sydney.
 
 > Companion to a [write-up](paper/md3-paper.md) on the system's design, AI-assisted development process, and what six weeks of dogfooded iteration looks like. The original April version (prepared for the Macquarie AI in Medicine Symposium) is preserved at [paper/archive/](paper/archive/). The full production system is private; this repo extracts the architecture and core algorithms into a form that's readable and runnable for personal use.
