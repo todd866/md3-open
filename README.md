@@ -2,7 +2,7 @@
 
 A simplified, MIT-licensed reference implementation of the spaced-repetition core that powers [md3.info](https://md3.info) — a personalised study tool used daily by a handful of medical students at the University of Sydney.
 
-> Companion to a [write-up](paper/md3-paper.md) on the system's design, AI-assisted development process, and early usage patterns (originally prepared for the Macquarie AI in Medicine Symposium, May 2026). The full production system is private; this repo extracts the architecture and core algorithms into a form that's readable and runnable for personal use.
+> Companion to a [write-up](paper/md3-paper.md) on the system's design, AI-assisted development process, and what six weeks of dogfooded iteration looks like. The original April version (prepared for the Macquarie AI in Medicine Symposium) is preserved at [paper/archive/](paper/archive/). The full production system is private; this repo extracts the architecture and core algorithms into a form that's readable and runnable for personal use.
 
 ## What this is (and isn't)
 
