@@ -162,20 +162,25 @@ The SOURCE / GROUND / AUDIT stages are where you bring your own corpus: [LocalEv
 The fastest path is to let Claude Code drive it. Open this repo in Claude Code and follow `CLAUDE.md` — it's written as the orchestration runbook for standing the stack up and wiring LocalEvidence to the card transform. Manually, the steps are:
 
 ```bash
-# 1. Clone and bring up the app + Postgres (see Quick Start above)
+# 1. Bring up the app + Postgres. Either:
+#
+#  (a) Docker — one command, no local Postgres needed:
 git clone https://github.com/todd866/md3-open
 cd md3-open
-createdb md3_open
-cp .env.example .env
-npm install
-npx prisma db push
-npm run dev            # app on http://localhost:3000
+docker compose up --build                    # app on http://localhost:3000
+docker compose run --rm app npm run seed     # load example content (once)
+#
+#  (b) Native — bring your own Postgres:
+#   createdb md3_open && cp .env.example .env && npm install
+#   npx prisma db push && npm run seed && npm run dev
 
 # 2. Run LocalEvidence alongside, on :8765
 #    (separate repo — grounded retrieval over YOUR corpus)
 #    LE exposes POST /api/ask and POST /api/verify-evidence
 LOCALEVIDENCE_PASSAGES=~/Projects/LocalEvidence/data/passages \
   python3 -m localevidence serve     # listens on 127.0.0.1:8765
+#    (docker-compose.yml has a commented `localevidence` service block to run
+#     it on the same compose network instead.)
 
 # 3. Warm a corpus — point LE at the PDFs you want graded curriculum from.
 #    A warm corpus answers grounded questions in <5s.
@@ -184,6 +189,15 @@ LOCALEVIDENCE_PASSAGES=~/Projects/LocalEvidence/data/passages \
 #    EvidencePack it returns (answer + cited passages), and run it through
 #    the generate → quality-gate → structure stages in src/lib/authoring/.
 #    The result is cards whose `cite` field points back at the evidence.
+
+# 5. Bulk-seed from an LE ledger: point the seed at a LocalEvidence
+#    ledger/answers.jsonl and grounded cards land in the DB on the next seed.
+LE_LEDGER_PATH=~/Projects/LocalEvidence/ledger/answers.jsonl npm run seed
+#    The card TEXT comes from an AuthorFn. The default is a deterministic
+#    placeholder (wiring/tests only); for real cards supply one — e.g. the
+#    reference Claude author in src/lib/authoring/grounding/author-claude.ts
+#    (`evidencePackToItemsWithClaude`, needs ANTHROPIC_API_KEY), or have your
+#    Claude Code orchestrator phrase the drafts directly.
 ```
 
 **Honest caveat about speed:** LocalEvidence is slow *only on a cold corpus* — the first time it sees a topic it may have to acquire and index PDFs, which can take a while. Once the corpus is warm, grounded answers come back in under five seconds, and curriculum generation is async anyway (you queue questions, cards land when they're ready). So the slowness is a one-time acquisition cost per topic, not a per-card cost. Warm the corpus for your rotation once, and the LE→card transform runs fast from then on.

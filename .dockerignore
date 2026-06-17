@@ -1,0 +1,16 @@
+node_modules
+.next
+out
+build
+.git
+.github
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+npm-debug.log*
+# Never bake secrets into the image — env comes from compose / the runtime.
+.env
+.env.*
+!.env.example
+# Build the image from source; the host's generated client is regenerated inside.
+src/generated/prisma

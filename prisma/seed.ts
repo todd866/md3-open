@@ -16,6 +16,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as crypto from 'crypto';
 import { parseRotationContent } from '../src/lib/card-generator';
+import { readLedgerLines, evidencePackToItems } from '../src/lib/authoring/grounding/le-to-cards';
 
 // ─── Database Connection ──────────────────────────────────────────
 
@@ -113,7 +114,9 @@ async function seedCards() {
 
   const softDeleted = await prisma.card.updateMany({
     where: {
-      stableId: { notIn: [...allCurrentStableIds] },
+      // Scope to MDX cards only — LocalEvidence cards (le: prefix) are swept
+      // separately by seedLeCards(), so this must not retire them.
+      stableId: { startsWith: 'mdx:', notIn: [...allCurrentStableIds] },
       deletedAt: null,
     },
     data: { deletedAt: new Date() },
@@ -214,6 +217,99 @@ async function seedQuestions() {
   return { totalQuestions, questionsByRotation };
 }
 
+// ─── LocalEvidence Card Seeding ───────────────────────────────────
+//
+// Ingest grounded answers from a LocalEvidence ledger (answers.jsonl) as
+// curriculum: each answered entry becomes a C1 cloze + a C2 MCQ via the
+// authoring kit's le-to-cards transform. Gated on LE_LEDGER_PATH — unset or
+// missing means this is a no-op, so the seed works fine without LocalEvidence.
+//
+// The default (passthrough) author yields PLACEHOLDER card text — enough to wire
+// the pipeline end to end. For real cards, pre-author the ledger with a
+// Claude-backed AuthorFn (see src/lib/authoring/grounding/author-claude.ts).
+
+function complexityToDifficulty(complexity: number): string {
+  return complexity <= 1 ? 'easy' : complexity >= 3 ? 'hard' : 'medium';
+}
+
+async function seedLeCards() {
+  const ledgerPath = process.env.LE_LEDGER_PATH;
+  if (!ledgerPath || !fs.existsSync(ledgerPath)) {
+    console.log(
+      ledgerPath
+        ? `  LE ledger not found at ${ledgerPath} — skipping LocalEvidence cards.`
+        : '  LE_LEDGER_PATH not set — skipping LocalEvidence cards.',
+    );
+    return { leCards: 0, leQuestions: 0 };
+  }
+
+  const rotation = process.env.LE_ROTATION || 'localevidence';
+  const sourceFile = path.relative(process.cwd(), ledgerPath);
+  const seenCardIds = new Set<string>();
+  let leCards = 0;
+  let leQuestions = 0;
+
+  for (const { id, pack } of readLedgerLines(ledgerPath)) {
+    for (const item of evidencePackToItems(pack, { id })) {
+      if (item.cardType === 'cloze') {
+        const stableId = item.stableId!;
+        const context = item.cite
+          ? `${item.context ?? ''}\n\nSource: ${item.cite}`.trim()
+          : item.context;
+        await prisma.card.upsert({
+          where: { stableId },
+          update: {
+            front: item.front, back: item.back, backs: item.backs ?? undefined,
+            context, topics: item.topics, complexity: item.complexity,
+            sourceFile, sourceComponent: 'LocalEvidence', week: null,
+          },
+          create: {
+            stableId, cardType: 'cloze', rotation, week: null,
+            sourceFile, sourceComponent: 'LocalEvidence',
+            front: item.front, back: item.back, backs: item.backs ?? undefined,
+            context, topics: item.topics, complexity: item.complexity,
+          },
+        });
+        seenCardIds.add(stableId);
+        leCards++;
+      } else {
+        const qid = item.stableId!;
+        // Normalise to plain JSON (strips any `undefined` so Prisma's Json field accepts it).
+        const options = JSON.parse(JSON.stringify(item.options));
+        await prisma.question.upsert({
+          where: { id: qid },
+          update: {
+            stem: item.stem, options, context: item.explanation ?? null,
+            rotation, week: null, topics: item.topics, source: 'localevidence',
+            sourceFile, questionType: 'diagnosis',
+            difficulty: complexityToDifficulty(item.complexity),
+          },
+          create: {
+            id: qid, stem: item.stem, options, context: item.explanation ?? null,
+            rotation, week: null, topics: item.topics, source: 'localevidence',
+            sourceFile, questionType: 'diagnosis',
+            difficulty: complexityToDifficulty(item.complexity),
+          },
+        });
+        leQuestions++;
+      }
+    }
+  }
+
+  // Scoped soft-delete: retire LE cards (le: prefix) no longer in the ledger.
+  if (seenCardIds.size > 0) {
+    const retired = await prisma.card.updateMany({
+      where: { stableId: { startsWith: 'le:', notIn: [...seenCardIds] }, deletedAt: null },
+      data: { deletedAt: new Date() },
+    });
+    if (retired.count > 0) {
+      console.log(`  Soft-deleted ${retired.count} LE cards no longer in the ledger`);
+    }
+  }
+
+  return { leCards, leQuestions };
+}
+
 // ─── Guest User ───────────────────────────────────────────────────
 
 async function ensureGuestUser() {
@@ -254,6 +350,14 @@ async function main() {
   console.log(`  Total: ${totalQuestions} questions upserted`);
   for (const [rotation, count] of Object.entries(questionsByRotation)) {
     console.log(`    ${rotation}: ${count} questions`);
+  }
+  console.log();
+
+  // 2b. LocalEvidence grounded cards (optional — gated on LE_LEDGER_PATH)
+  console.log('Loading LocalEvidence cards:');
+  const { leCards, leQuestions } = await seedLeCards();
+  if (leCards || leQuestions) {
+    console.log(`  Total: ${leCards} LE cards, ${leQuestions} LE questions`);
   }
   console.log();
 

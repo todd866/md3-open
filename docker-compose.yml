@@ -1,0 +1,67 @@
+# md3-open — local spool-up: Postgres + the Next.js app.
+#
+#   docker compose up --build        # DB + app on http://localhost:3000
+#   docker compose run --rm app npm run seed   # load example content (once)
+#
+# The app container runs `prisma db push` on boot (idempotent schema sync), so a
+# fresh DB is ready without a manual migrate step. LocalEvidence — the grounded
+# retrieval service the card-authoring kit pulls evidence from — is a SEPARATE
+# repo; a commented service block at the bottom shows how to wire it in. The kit
+# runs fine without it (grounded-card seeding is gated on LE_LEDGER_PATH).
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: md3
+      POSTGRES_PASSWORD: md3
+      POSTGRES_DB: md3_open
+    ports:
+      - "5432:5432"
+    volumes:
+      - md3_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U md3 -d md3_open"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://md3:md3@db:5432/md3_open
+      # ── Optional: grounded-card seeding from a LocalEvidence ledger ──────────
+      # Mount a ledger file into the container (see the volume below) and point
+      # the seed at it. Leave unset to skip LE cards entirely.
+      # LE_LEDGER_PATH: /le/ledger/answers.jsonl
+      # LE_ROTATION: localevidence
+      # ── Optional: the reference Claude card author (SDK route) ───────────────
+      # Only needed if a batch job uses src/lib/authoring/grounding/author-claude.ts.
+      # ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    ports:
+      - "3000:3000"
+    # volumes:
+    #   # Mount your LocalEvidence ledger directory read-only for grounded seeding.
+    #   - ${LE_LEDGER_DIR:-./le-ledger}:/le/ledger:ro
+
+volumes:
+  md3_pgdata:
+
+# ── LocalEvidence (separate repo) ─────────────────────────────────────────────
+# LE is not part of this repo. Clone it alongside (../LocalEvidence), give it a
+# Dockerfile that runs `localevidence serve` on :8765, then add a service like:
+#
+#   localevidence:
+#     build: ../LocalEvidence
+#     ports:
+#       - "8765:8765"
+#     volumes:
+#       - ${LE_CORPUS_DIR:-../PaperLibrary}:/corpus:ro
+#
+# The le-client (src/lib/authoring/grounding/le-client.ts) takes a `baseUrl`
+# option, defaulting to http://127.0.0.1:8765. From inside compose, have your
+# batch job pass baseUrl `http://localevidence:8765` (e.g. via an LE_BASE_URL
+# env var your job reads) so the app reaches LE over the compose network.
