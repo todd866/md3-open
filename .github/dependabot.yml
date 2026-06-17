@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    # Snapshot repo — major-version bumps need human review for breaking
+    # changes (Next.js, React, Prisma especially). Patch + minor flow
+    # through automatically via the monthly cadence.
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    # Same major-version-review policy as npm — GH Actions majors (e.g.
+    # actions/checkout v4 → v6) can change defaults or required permissions.
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
