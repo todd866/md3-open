@@ -84,9 +84,10 @@ export interface AuthoredDrafts {
  * those drafts into contract-shaped {@link AuthoredItem}s — it never invents the
  * clinical content itself.
  *
- * `topics` is the suggested topic list (derived deterministically from the
- * question); the author may refine it but the glue will use what it returns or
- * fall back to the suggestion.
+ * `topics` is the deterministic topic suggestion (see {@link deriveTopics}). It
+ * is advisory only: the glue wires those derived topics onto the minted items
+ * regardless of what the author returns, so use it to shape phrasing — not to
+ * override topics ({@link AuthoredDrafts} has no topics channel by design).
  */
 export type AuthorFn = (input: {
   pack: EvidencePack;
@@ -110,7 +111,7 @@ export const passthroughAuthor: AuthorFn = ({ pack, topics }) => {
   return {
     cloze: {
       front: `${pack.question.replace(/\?+$/, "")} → [___].`,
-      back: "see answer",
+      back: "[placeholder]",
       context: short,
     },
     mcq: {
@@ -154,8 +155,9 @@ function topSource(pack: EvidencePack): SourceRef | undefined {
 
 /**
  * Derive a coarse topic suggestion from the question. Deterministic and crude on
- * purpose — the {@link AuthorFn} is expected to refine it. Extracts capitalised /
- * multi-word noun-ish tokens, deduped, capped.
+ * purpose — these are the topics the glue wires onto minted items; the
+ * {@link AuthorFn} sees them only to frame its prompt and cannot override them.
+ * Extracts capitalised / multi-word noun-ish tokens, deduped, capped.
  */
 export function deriveTopics(question: string, max = 4): string[] {
   const stop = new Set([

@@ -171,7 +171,7 @@ export type AuthoredItem = AuthoringCard | AuthoringQuestion;
 ## Sources & grounding — the LocalEvidence seam
 
 This is where the kit meets a retrieval service. The reference setup runs
-[LocalEvidence](https://github.com/todd866) as a sidecar exposing `/api/ask` and
+[LocalEvidence](https://github.com/todd866/LocalEvidence) as a sidecar exposing `/api/ask` and
 `/api/verify-evidence` on `:8765`, over a warmed corpus (PaperLibrary). These types
 are the **schema of what crosses that wire** — so you can swap LocalEvidence for any
 retriever that produces the same shape.

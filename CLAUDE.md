@@ -229,11 +229,15 @@ LE → card transform mints grounded curriculum.
 
 - **TypeScript, path alias `@/` → `src/`.** Import contracts as
   `import type { ... } from "@/lib/authoring/contracts";`.
-- **Pure and dependency-light.** Authoring modules operate on contract types and
-  plain strings. No Prisma/Postgres, no Next.js, no embeddings/vector code, no
-  cron, no auth, no network inside the pure modules (the one networked seam is
-  `grounding/`, and that is an explicit HTTP client). Each file compiles as
-  standalone TS with no unresolved imports. Prefer zero new npm deps.
+- **Pure and dependency-light core.** The GENERATE / QUALITY-GATE / STRUCTURE
+  modules operate on contract types and plain strings: no Prisma/Postgres, no
+  Next.js, no embeddings/vector code, no cron, no auth, no network, and no new npm
+  deps. `grounding/` holds the two networked seams: `le-client.ts` (an explicit
+  HTTP client to the LocalEvidence service) and `author-claude.ts` (the reference
+  Claude author — the one module that adds an npm dep, `@anthropic-ai/sdk` +
+  `zod/v4`, and calls the Anthropic API; deliberately kept OUT of `index.ts` so the
+  SDK stays off the core path). Each file compiles as standalone TS with no
+  unresolved imports.
 - **Intentionally simplified posture.** This is a reference companion, not the
   production system. Auth, hardening, real corpora, observability, and
   institution-specific data are out of scope here — do not expect them, and do

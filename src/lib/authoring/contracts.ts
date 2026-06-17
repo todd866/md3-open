@@ -53,6 +53,15 @@ export interface McqOption {
 export interface AuthoringQuestion {
   cardType: "mcq";
   stem: string;
+  /**
+   * Two minimums apply, by design. GENERATE/GROUND treat **≥2** as the structural
+   * validity floor (`buildMcq`, `validateQuestion`); the QUALITY-GATE
+   * (`runMcqGates`) expects **≥4** — the single-best-answer house standard. So a
+   * 2–3 option item is valid-but-below-standard and the gate flags it (not a
+   * contradiction — validity and quality are separate bars). The deterministic
+   * `passthroughAuthor` placeholder emits 2 options and is wiring-only, below the
+   * quality bar on purpose; real authors (e.g. author-claude.ts) emit 4.
+   */
   options: McqOption[];
   explanation?: string;
   complexity: Complexity;

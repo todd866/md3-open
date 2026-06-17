@@ -126,7 +126,7 @@ Cloze cards use `[___]` blanks paired with `**bold answers**` that become intera
 npm run dev        # Development server
 npm run build      # Production build
 npm run seed       # Seed database from content
-npm run test:run   # Run tests (34 tests)
+npm run test:run   # Run the test suite
 ```
 
 ## Build your own (LE + MD3 stack)
@@ -193,6 +193,8 @@ LOCALEVIDENCE_PASSAGES=~/Projects/LocalEvidence/data/passages \
 # 5. Bulk-seed from an LE ledger: point the seed at a LocalEvidence
 #    ledger/answers.jsonl and grounded cards land in the DB on the next seed.
 LE_LEDGER_PATH=~/Projects/LocalEvidence/ledger/answers.jsonl npm run seed
+#    LE cards land under the `localevidence` rotation by default; set
+#    LE_ROTATION=<your-rotation> to tag them for an existing rotation/UI.
 #    The card TEXT comes from an AuthorFn. The default is a deterministic
 #    placeholder (wiring/tests only); for real cards supply one — e.g. the
 #    reference Claude author in src/lib/authoring/grounding/author-claude.ts

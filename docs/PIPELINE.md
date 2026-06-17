@@ -91,12 +91,20 @@ straight into the TS generator.
 **Inputs.** A question string (often from a curriculum learning objective).
 **Outputs.** One `EvidencePack`.
 
-**Implemented here.** No TS implementation — grounding *is* the LocalEvidence
-service. The kit defines the contract (`EvidencePack`, `EvidencePassage`,
-`SourceRef`, `GroundingResult`) and the citation bridge in
-[`structure/cite.ts`](../src/lib/authoring/structure/cite.ts) (`sourceDefinitionToRef`
-converts a corpus source definition into a contract `SourceRef`). Fork this seam
-by reimplementing `/api/ask` against your own retriever and emitting `EvidencePack`.
+**Implemented here — [`src/lib/authoring/grounding/`](../src/lib/authoring/grounding/):**
+The retrieval itself lives in the LocalEvidence service (a separate repo); the kit
+defines the contract (`EvidencePack`, `EvidencePassage`, `SourceRef`,
+`GroundingResult`) and three in-repo TS modules that talk to it and turn its output
+into cards:
+
+| Module | Key exports | What it does |
+|--------|-------------|--------------|
+| [`le-client.ts`](../src/lib/authoring/grounding/le-client.ts) | `ask`, `verifyEvidence`, `leEntryToEvidencePack`, `DEFAULT_LE_BASE_URL` | HTTP client to the LocalEvidence service (`/api/ask`, `/api/verify-evidence`). Fork this seam by reimplementing it against your own retriever and emitting `EvidencePack`. |
+| [`le-to-cards.ts`](../src/lib/authoring/grounding/le-to-cards.ts) | `evidencePackToItems`, `readLedger`, `readLedgerLines`, `leStableId`, `topCite`, `deriveTopics`, `AuthorFn`, `AuthoredDrafts`, `passthroughAuthor` | The GROUND→GENERATE synthesis transform: one `EvidencePack` (or a bulk LE ledger) → authored items, with identity (`le:<id>`), citation, and complexity wired deterministically. The **`AuthorFn`** seam (intentionally synchronous) is where card *text* comes from; `passthroughAuthor` is the no-LLM placeholder. |
+| [`author-claude.ts`](../src/lib/authoring/grounding/author-claude.ts) | `evidencePackToItemsWithClaude`, `draftCardsWithClaude`, `makeClaudeDrafter` | The reference Claude-backed author (adds `@anthropic-ai/sdk`; the one module NOT re-exported from `index.ts`). Awaits drafts from the model, then feeds them through the sync glue. |
+
+Also the citation bridge in [`structure/cite.ts`](../src/lib/authoring/structure/cite.ts)
+(`sourceDefinitionToRef` converts a corpus source definition into a contract `SourceRef`).
 
 ---
 

@@ -78,6 +78,7 @@ async function seedCards() {
           sourceFile: card.sourceFile,
           sourceComponent: card.sourceComponent,
           week: card.week,
+          deletedAt: null, // resurrect a card that has returned to source
         },
         create: {
           stableId,
@@ -262,6 +263,7 @@ async function seedLeCards() {
             front: item.front, back: item.back, backs: item.backs ?? undefined,
             context, topics: item.topics, complexity: item.complexity,
             sourceFile, sourceComponent: 'LocalEvidence', week: null,
+            deletedAt: null, // resurrect if this card has returned to the ledger
           },
           create: {
             stableId, cardType: 'cloze', rotation, week: null,
@@ -297,15 +299,18 @@ async function seedLeCards() {
   }
 
   // Scoped soft-delete: retire LE cards (le: prefix) no longer in the ledger.
-  if (seenCardIds.size > 0) {
-    const retired = await prisma.card.updateMany({
-      where: { stableId: { startsWith: 'le:', notIn: [...seenCardIds] }, deletedAt: null },
-      data: { deletedAt: new Date() },
-    });
-    if (retired.count > 0) {
-      console.log(`  Soft-deleted ${retired.count} LE cards no longer in the ledger`);
-    }
+  // Unconditional, matching the MDX sweep: if the ledger now yields zero cards,
+  // `notIn: []` correctly retires every previously-seeded le: card.
+  const retired = await prisma.card.updateMany({
+    where: { stableId: { startsWith: 'le:', notIn: [...seenCardIds] }, deletedAt: null },
+    data: { deletedAt: new Date() },
+  });
+  if (retired.count > 0) {
+    console.log(`  Soft-deleted ${retired.count} LE cards no longer in the ledger`);
   }
+  // NOTE: LE-seeded MCQs land in `Question`, which has no soft-delete column, so
+  // they are not retired here (same as the question-bank path). The cloze and MCQ
+  // minted from one ledger entry therefore have divergent lifecycles by design.
 
   return { leCards, leQuestions };
 }

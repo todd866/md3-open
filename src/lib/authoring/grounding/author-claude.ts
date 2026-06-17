@@ -18,8 +18,9 @@
  * phrase cards imports it directly
  *   (`import { evidencePackToItemsWithClaude } from "@/lib/authoring/grounding/author-claude"`),
  * keeping the SDK out of anything that only needs the contracts. Requires
- * `@anthropic-ai/sdk` (already a dependency here) and an `ANTHROPIC_API_KEY` in
- * the environment, or an injected client.
+ * `@anthropic-ai/sdk` (a dependency added for this module — the only new npm dep
+ * the kit pulls in) and an `ANTHROPIC_API_KEY` in the environment, or an injected
+ * client.
  *
  * ── The deployment-model alternative ──────────────────────────────────────────
  * md3-open's model is "Claude Code orchestrates, BYO token budget." Many forks
@@ -222,7 +223,7 @@ function buildPrompt(pack: EvidencePack, topics: string[]): string {
   if (pack.reasoning?.trim()) parts.push(`REASONING:\n${pack.reasoning.trim()}`);
   if (pack.confidence) parts.push(`ANSWER CONFIDENCE: ${pack.confidence}`);
   parts.push(`EVIDENCE:\n${formatEvidence(pack)}`);
-  if (topics.length) parts.push(`SUGGESTED TOPICS (refine if needed): ${topics.join(", ")}`);
+  if (topics.length) parts.push(`SUGGESTED TOPICS (for framing; applied to the cards automatically): ${topics.join(", ")}`);
   parts.push(
     "Author the cloze and MCQ from the above. Return null for either type if the evidence can't support a clean card of that type.",
   );

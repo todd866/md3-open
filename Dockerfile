@@ -37,6 +37,8 @@ COPY --from=build /app ./
 
 EXPOSE 3000
 
-# Idempotent schema sync, then serve. Seed content separately, once:
+# Idempotent schema sync (retried until the DB is reachable, so a plain
+# `docker run` against a still-initialising DB waits instead of crash-looping —
+# compose already gates this on a healthcheck), then serve. Seed separately, once:
 #   docker compose run --rm app npm run seed
-CMD ["sh", "-c", "npx prisma db push --skip-generate && npm run start -- -H 0.0.0.0 -p 3000"]
+CMD ["sh", "-c", "until npx prisma db push --skip-generate; do echo 'waiting for database...'; sleep 2; done && npm run start -- -H 0.0.0.0 -p 3000"]
