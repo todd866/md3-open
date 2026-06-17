@@ -10,11 +10,11 @@ A simplified, MIT-licensed reference implementation of the spaced-repetition cor
 
 ## What this is (and isn't)
 
-**Is:** the spaced-repetition scheduler, MDX content pipeline, cloze-card extractor, MCQ component, and review session UI — enough to demonstrate the approach and to fork as a starting point for similar tools.
+**Is:** the spaced-repetition scheduler, MDX content pipeline, cloze-card extractor, MCQ component, review session UI, and the evidence-grounded card-authoring kit ([`src/lib/authoring/`](src/lib/authoring/)) — enough to demonstrate the approach and to fork as a starting point for similar tools.
 
 **Isn't:**
 - The production system. Auth, error handling, error tracking, scheduler complexity, and test coverage are all intentionally trimmed.
-- Up to date with `md3.info`. This snapshot is from April 2026; the production codebase has since added an embedding-aware manifold scheduler, a deliberate-teaching layer, empirical-difficulty calibration, ~9 daily audit pipelines, and roughly 4× the test coverage. None of that complexity is needed to demonstrate the core idea.
+- Up to date with `md3.info`. The scheduler / content / review core is the April 2026 skeleton; the card-authoring kit (`src/lib/authoring/`) was open-sourced later (June 2026) as the standalone authoring stack. Production has since grown an embedding-aware manifold scheduler, a deliberate-teaching layer, empirical-difficulty calibration, ~9 daily audit pipelines, and roughly 4× the test coverage — none of which is needed to demonstrate the core idea (see "What's in production but not here" below).
 - A general-purpose framework. Built for one curriculum (USyd Year 3 clinical rotations), one user, one set of design constraints.
 
 ## Quick start
@@ -102,7 +102,7 @@ Cloze cards use `[___]` blanks paired with bold answers — see `content/example
 ## Stack
 
 - **Next.js 16** (App Router) + MDX
-- **Prisma 6** + PostgreSQL
+- **Prisma 7** + PostgreSQL
 - **Tailwind CSS 4**
 - **Zod** for runtime validation
 - **Vitest** for tests (the scheduler/daily-target core plus the authoring-kit suites under `src/lib/authoring/`)
